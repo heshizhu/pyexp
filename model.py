@@ -75,7 +75,3 @@ def test_fn(ent_embed, rel_embed):
 
     return theano.function(inputs=[idx], \
                            outputs=pos_F, on_unused_input='ignore')
-
-
-    
-
