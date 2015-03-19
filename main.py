@@ -1,3 +1,5 @@
+# encoding:utf-8
+
 import cPickle
 import time
 import random

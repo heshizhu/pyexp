@@ -1,9 +1,10 @@
+# encoding:utf-8
 import numpy as np
 import cPickle
 
 # dev
 def thresh(score, label, interval_value=0.01):
-    score = np.asarray(score)
+    score = np.asarray(score) # 什么意思？
     max_score = np.max(score)
     min_score = np.min(score)
     n_interval = int((max_score - min_score) / interval_value)
@@ -17,7 +18,7 @@ def thresh(score, label, interval_value=0.01):
         if (score[j] > tmp_thresh):
             predict_label[j] = '1'
         else:
-        predict_label[j] = '-1'
+            predict_label[j] = '-1'
 
     for j in xrange(len(label)):
         if (predict_label[j] == label[j]):

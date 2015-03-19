@@ -1,10 +1,11 @@
+# encoding:utf-8
 import numpy as np
 import random
 import time
 import cPickle
 
 
-base_path = 'G:/temp/TransX/wn11/TransE/'
+base_path = '~/temp/TransX/fb13/TransE/'
 
 read_file_start = time.time()
 
@@ -50,7 +51,7 @@ rule = []
 entity_list = list(set(entity_list))
 relation_list = list(set(relation_list))
 
-#save entity and relations
+# save entity and relations
 entity_fid = open(base_path + '../data/entity-list.txt', 'w')
 for ele in entity_list:
     entity_fid.write(ele + '\n')
@@ -60,6 +61,8 @@ relation_fid = open(base_path + '../data/relation-list.txt', 'w')
 for ele in relation_list:
     relation_fid.write(ele + '\n')
 relation_fid.close()
+
+
 read_file_end = time.time()
 
 entity2id = {}
@@ -79,20 +82,23 @@ for r in relation_list:
     id2relation[count] = r
     count += 1
 
-#save dev and test set
+# save dev and test set
 dev_triple_fid = open(base_path + '../data/dev_triple.pkl', 'wb')
-cPickle.dump(dev_triples, dev_triple_fid, -1)
+cPickle.dump(dev_triples, dev_triple_fid, -1)#-1表示什么意思？
 dev_triple_fid.close()
 
 test_triple_fid = open(base_path + '../data/test_triple.pkl', 'wb')
 cPickle.dump(test_triples, test_triple_fid, -1)
 test_triple_fid.close()
+
 print 'read file time spends %f s' % (read_file_end - read_file_start)
 
 n_relation = len(relation_list)
 n_entity = len(entity_list)
 head = [{} for i in xrange(n_relation)]
 tail = [{} for i in xrange(n_relation)]
+
+# 相当于head和tail为rel_num * ent_num 的矩阵
 
 for i in xrange(n_relation):
     for j in xrange(n_entity):
@@ -132,6 +138,9 @@ construct_negative_start = time.time()
 train_triple = train_list
 train_rule = rule
 neg_num = 2000
+
+# np.zeros((a, b), 'int32')表示什么？
+
 train_triple_idx = np.zeros((len(train_triple), 3), 'int32')
 dev_triple_idx = np.zeros((len(dev_triples), 3), 'int32')
 test_triple_idx = np.zeros((len(test_triples), 3), 'int32')
@@ -144,6 +153,8 @@ for i in xrange(len(dev_triples)):
     rel_idx = relation2id[e[1]]
     e2_idx = entity2id[e[2]]
     dev_triple_idx[i] = np.asarray([e1_idx, rel_idx, e2_idx], 'int32')
+
+    # np.asarray表示什么？
 
 for i in xrange(len(test_triples)):
     ele = test_triples[i]
@@ -195,6 +206,8 @@ dev_triple_idx_fid.close()
 test_triple_idx_fid = open(base_path + '../data/test_triple_idx.pkl', 'wb')
 cPickle.dump(test_triple_idx, test_triple_idx_fid, -1)
 test_triple_idx_fid.close()
+
+# 下面为什么分两部分存储？
 
 negative_train_triple_idx_fid = open(base_path + '../data/negative_train_triple_idx_0.pkl', 'wb')
 cPickle.dump(negative_train_triple_idx[0:60000], negative_train_triple_idx_fid, -1)

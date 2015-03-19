@@ -1,3 +1,5 @@
+# encoding:utf-8
+
 import theano.tensor as T
 import collections
 import numpy as np
