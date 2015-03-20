@@ -35,7 +35,7 @@ def norm(matrix):
     return T.sqrt(T.sum(T.sqr(matrix), axis=1))
 
 
-# given a minibathc triples idx and entity + relatoion embeddings, compute |F|
+# given a mini-batch triples idx and entity + relation embeddings, compute |F|
 def compute_triple_F(e1, rel, e2):
     return -norm(e1 + rel - e2)
 
