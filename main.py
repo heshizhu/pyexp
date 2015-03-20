@@ -26,7 +26,7 @@ negative_train_triples_idx_fid.close()
 
 negative_train_triples_idx = np.concatenate([negative_train_triples_idx_0, negative_train_triples_idx_1], axis=0)
 
-negative_id_fid = open(base_path + '../data/negative_id.pkl')
+negative_id_fid = open(base_path + '../data/negative_id.pkl') # st里面没有negative_id.pkl??
 negative_id = cPickle.load(negative_id_fid)
 negative_id_fid.close()
 
@@ -49,15 +49,15 @@ test_triple_fid.close()
 
 #read entity and relations
 entity_fid = open(base_path + '../data/entity-list.txt')
-entity_list = []
-for ele in entity_fid:
-    entity_list.append(ele.strip('\n'))
+entity_list = [ele.strip('\n') for ele in entity_fid]
+# for ele in entity_fid:
+#     entity_list.append(ele.strip('\n'))
 entity_fid.close()
 
 relation_fid = open(base_path + '../data/relation-list.txt')
-relation_list = []
-for ele in relation_fid:
-    relation_list.append(ele.strip('\n'))
+relation_list = [ele.strip('\n') for ele in relation_fid]
+# for ele in relation_fid:
+#     relation_list.append(ele.strip('\n'))
 relation_fid.close()
 
 read_data_file_end = time.time()
@@ -73,7 +73,7 @@ print 'read data file spend %f s.' % (read_data_file_end - read_data_file_start)
 def sample_minibatch(minibatch_size, train_triples_idx, negative_train_triples_idx):
     n_train_triples = train_triples_idx.shape[0]
     n_batches = int(n_train_triples / minibatch_size)
-    total_idx = np.zeros((n_batches, minibatch_size, 7), 'int32')
+    total_idx = np.zeros((n_batches, minibatch_size, 7), 'int32') # 7是什么意思，为什么不是6
     idx_all_triples = range(0, n_train_triples)
     sub_idx_range = range(2000)
 
@@ -108,7 +108,7 @@ rel_embed = theano.shared(value = rel_embed_initial, \
                           name='rel_embed', borrow = True)
 '''
 ent_embed_fid = open(base_path + '../data/ent_embed_' + str(1649) + '.pkl')
-ent_embed = cPickle.load(ent_embed_fid)
+ent_embed = cPickle.load(ent_embed_fid) #存在这个文件吗？是存储初始值还是TransE的结果
 ent_embed_fid.close()
 rel_embed_fid = open(base_path + '../data/rel_embed_' + str(1649) + '.pkl')
 rel_embed = cPickle.load(rel_embed_fid)
