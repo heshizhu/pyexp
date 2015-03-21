@@ -132,6 +132,6 @@ for i in range(1649, 2000):
     dev_F = test(dev_triples_idx)
     test_F = test(test_triples_idx)
     current_acc = output_result(dev_triples, dev_F, test_triples, test_F, relation_list)
-    if (current_acc > best_acc):
+    if current_acc > best_acc:
         best_acc = current_acc
-    print 'The highest acc is:%4.4f' % (best_acc)
+    print 'The highest acc is:%4.4f' % best_acc
