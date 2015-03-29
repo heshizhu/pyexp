@@ -1,16 +1,18 @@
 #encoding:utf-8
 import os
 import codecs
+import numpy as np
+import theano
+import theano.tensor as T
 
-
-os.chdir("G:/temp/TransX/fb13/TransE/")
+os.chdir("/Users/hesz/temp/TransX/fb13/TransE/")
 
 ent2id, id2ent = dict(), dict()
 rel2id, id2rel = dict(), dict()
 
 rel_subs, rel_objs = dict(), dict()
 head_npt, tail_nph = dict(), dict() # head_npt为平均每个tail有多少个head
-train_tri, valid_tri, test_tri = list()
+train_tri, valid_tri, test_tri = list(), list(), list()
 
 # loading data
 with codecs.open('../data/entity2id.txt', encoding='utf-8') as f:
@@ -57,9 +59,8 @@ print "valid : " + str(valid_num)
 print "test : " + str(test_num)
 
 class Param:
-    def __init__(self, epoch = 1000, batch = 120,
-                 l1_flag = 0, neg_method = 1, neg_scope = 0,
-                 dim = 50, margin = 1):
+    def __init__(self, epoch = 1000, batch = 120, dim = 50, margin = 1.0,
+                 l1_flag = False, neg_method = True, neg_scope = False):
         self.epoch = epoch
         self.batch = batch
         self.l1_flag = l1_flag
@@ -67,17 +68,49 @@ class Param:
         self.neg_scope = neg_scope
         self.dim = dim
         self.margin = margin
+    def toItems(self):
+        items = dict()
+        items['epoch'] = self.epoch
+        items['batch'] = self.epoch
+        items['l1_flag'] = self.l1_flag
+        items['neg_method'] = self.neg_method
+        items['neg_scope'] = self.neg_scope
+        items['dim'] = self.dim
+        items['margin'] = self.margin
+        return items
 
-#
-# def read_param():
-#     if(os.path.exists("proc")):
-#         with codecs.open('proc', encoding='utf-8') as f:
-#             proc_id = int(f.readline()) + 1
-#     else:
-#         proc_id = 1
-#     with codecs.open('proc', 'w', encoding='utf-8') as f:
-#         f.write(str(proc_id))
+def write_param(param):
+    if(os.path.exists("proc")):
+        with codecs.open('proc', encoding='utf-8') as f:
+            proc_id = int(f.readline()) + 1
+    else:
+        proc_id = 1
+    with codecs.open('proc', 'w', encoding='utf-8') as f:
+        f.write(str(proc_id))
+    with codecs.open('%d.param' % proc_id, 'w', encoding='utf-8') as f:
+        f.writelines([('%s\t%s' % str(k), str(v)) for (k, v) in param.toItems().items()])
+
+
+param = Param()
+
+# 初始化参数
+r = 0.01
+rng = np.random.RandomState(1234)
+ent_embed_initial = np.asarray(rng.uniform(low=-r,high=r,size=(ent_num, param.dim)),dtype=theano.config.floatX)
+rel_embed_initial = np.asarray(rng.uniform(low=-r,high=r,size=(rel_num, param.dim)),dtype=theano.config.floatX)
+# 向量长度为1
+
+ent_embed_initial = T.sqrt(T.sum(T.sqr(ent_embed_initial), axis=1)) #是什么意思
+rel_embed_initial = T.sqrt(T.sum(T.sqr(rel_embed_initial), axis=1))
+
+ent_embed = theano.shared(value = ent_embed_initial, name='ent_embed', borrow = True)
+rel_embed = theano.shared(value = rel_embed_initial, name='rel_embed', borrow = True)
+
+# 构造负样本
+
 
 
 if __name__ == "__main__":
     print("start")
+    for (k, v) in Param().toItems().items():
+        print k, v
