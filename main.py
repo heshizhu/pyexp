@@ -100,7 +100,7 @@ n_relation = len(relation_list)
 r = 0.01
 rng = np.random.RandomState(1234)
 ent_embed_initial = np.asarray(rng.uniform(low=-r,high=r,size=(n_entity,n_dim)),dtype=theano.config.floatX)
-rel_embed_initial = np.asarray(rng.uniform(low=-r,high=r,size=(n_entity,n_dim)),dtype=theano.config.floatX)
+rel_embed_initial = np.asarray(rng.uniform(low=-r,high=r,size=(n_relation,n_dim)),dtype=theano.config.floatX)
 
 ent_embed = theano.shared(value = ent_embed_initial, \
                           name='ent_embed', borrow = True)
