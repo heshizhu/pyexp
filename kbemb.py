@@ -4,6 +4,7 @@ import codecs
 import numpy as np
 import theano
 import theano.tensor as T
+import random
 
 os.chdir("/Users/hesz/temp/TransX/fb13/TransE/")
 
@@ -68,6 +69,7 @@ class Param:
         self.neg_scope = neg_scope
         self.dim = dim
         self.margin = margin
+        self.write_param()
     def toItems(self):
         items = dict()
         items['epoch'] = self.epoch
@@ -78,19 +80,17 @@ class Param:
         items['dim'] = self.dim
         items['margin'] = self.margin
         return items
-
-def write_param(param):
-    if(os.path.exists("proc")):
-        with codecs.open('proc', encoding='utf-8') as f:
-            proc_id = int(f.readline()) + 1
-    else:
-        proc_id = 1
-    with codecs.open('proc', 'w', encoding='utf-8') as f:
-        f.write(str(proc_id))
-    with codecs.open('%d.param' % proc_id, 'w', encoding='utf-8') as f:
-        f.writelines([('%s\t%s' % str(k), str(v)) for (k, v) in param.toItems().items()])
-
-
+    def write_param(self):
+        if(os.path.exists("proc")):
+            with codecs.open('proc', encoding='utf-8') as f:
+                proc_id = int(f.readline()) + 1
+        else:
+            proc_id = 1
+        with codecs.open('proc', 'w', encoding='utf-8') as f:
+            f.write(str(proc_id))
+        self.proc_id = proc_id
+        with codecs.open('%d.param' % proc_id, 'w', encoding='utf-8') as f:
+            f.writelines([('%s\t%s' % str(k), str(v)) for (k, v) in param.toItems().items()])
 param = Param()
 
 # 初始化参数
@@ -106,7 +106,27 @@ rel_embed_initial = T.sqrt(T.sum(T.sqr(rel_embed_initial), axis=1))
 ent_embed = theano.shared(value = ent_embed_initial, name='ent_embed', borrow = True)
 rel_embed = theano.shared(value = rel_embed_initial, name='rel_embed', borrow = True)
 
+def sampleNeg(pos_tri):
+    neg_tri = pos_tri
+    head_pro = 500
+    if param.neg_method:
+        head_pro = 1000 * tail_nph[pos_tri[1]] / (tail_nph[pos_tri[1]] + head_npt[pos_tri[1]])
+    if random.randint(1, 1000) <= head_pro:
+        neg_tri[0] = random.randint(len(id2ent))
+    else:
+        neg_tri[2] = random.randint(len(id2ent))
+    return neg_tri
+
+
+
 # 构造负样本
+for epoch_id in xrange(param.epoch):
+    for batch_id in xrange(int(train_num / param.batch)):
+        pos_tris = random.sample(train_tri, param.batch)
+        neg_tris = [sampleNeg(pt) for pt in pos_tris]
+
+
+
 
 
 
