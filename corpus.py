@@ -3,9 +3,21 @@
 import os
 import codecs
 
-base_path = "G:/temp/TransX/fb15k/"
+base_path = "G:/temp/TransX/fb15k_380/"
 
 if __name__ == '__main__':
+    with codecs.open(base_path + 'data/relations.txt', encoding='utf-8') as f:
+        relations = set([l.strip() for l in f.readlines()])
+    print len(relations)
+    for name in ['train', 'valid', 'test']:
+        with codecs.open('%sdata/%s.txt' % (base_path, name), encoding='utf-8') as f:
+            lines = [l for l in f.readlines() if l.split('\t')[1].strip() in relations]
+        with codecs.open('%sdata/%s_fil.txt' % (base_path, name), 'w', encoding='utf-8') as f:
+            f.writelines(lines)
+
+
+
+def corpus_statistic():
     triples, relations = list(), list()
     rel_heads, rel_tails, rel_tris = dict(), dict(), dict()
     head_npt, tail_nph = dict(), dict()
@@ -33,6 +45,18 @@ if __name__ == '__main__':
         head_npt[rel] = sum(map(lambda x : len(x), rel_tail_heads[rel].values())) * 1.0 / len(rel_tail_heads[rel])
         tail_nph[rel] = sum(map(lambda x : len(x), rel_head_tails[rel].values())) * 1.0 / len(rel_head_tails[rel])
 
+    count = 0
     for rel in relations:
+        if len(rel_heads[rel]) == 1 or len(rel_tails[rel]) == 1:
+            continue
+        if rel_tris[rel] < 100:
+            continue
         print rel, '\t', rel_tris[rel], '\t', len(rel_heads[rel]), '\t', len(rel_tails[rel]), '\t',\
         head_npt[rel], '\t', tail_nph[rel]
+        count += 1
+    print '个数：', count
+
+
+#过滤规则
+#关系不同head和tail个数为1的过滤
+#三元组个数少于100次
